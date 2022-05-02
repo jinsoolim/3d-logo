@@ -54,59 +54,60 @@
         var scene = null;
         var sceneToRender = null;
         var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
-        var createScene = function () {
-    // This creates a basic Babylon Scene object (non-mesh)
-    var scene = new BABYLON.Scene(engine);
+        const createScene = () => {
+            const scene = new BABYLON.Scene(engine);
 
-    // This creates and positions a free camera (non-mesh)
-    var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
+            const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(.5,0,0));
+            camera.attachControl(canvas, true);
 
-    // This targets the camera to scene origin
-    camera.setTarget(BABYLON.Vector3.Zero());
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0,1,0));
 
-    // This attaches the camera to the canvas
-    camera.attachControl(canvas, true);
-
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
-    light.intensity = 0.7;
-
-    // Our built-in 'ground' shape.
-    var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
-    let groundMaterial = new BABYLON.StandardMaterial("Ground Material", scene);
-    ground.material = groundMaterial;
-    let groundTexture = new BABYLON.Texture(Assets.textures.checkerboard_basecolor_png.rootUrl, scene);
-    ground.material.diffuseTexture = groundTexture;
-
-    BABYLON.SceneLoader.ImportMesh("", Assets.meshes.Yeti.rootUrl, Assets.meshes.Yeti.filename, scene,
-    function(newMeshes) {
-        newMeshes[0].scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-    })
-
-     
-
-    return scene;
-};
-                window.initFunction = async function() {
-                    
-                    
-                    var asyncEngineCreation = async function() {
-                        try {
-                        return createDefaultEngine();
-                        } catch(e) {
-                        console.log("the available createEngine function failed. Creating the default engine instead");
-                        return createDefaultEngine();
-                        }
+            const createLogo = () => {
+                for (let i = 0; i <= 2; i+=1) {
+                    const box1 = BABYLON.MeshBuilder.CreateBox(`box1${i}`, {});
+                    const box2 = BABYLON.MeshBuilder.CreateBox(`box2${i}`, {});
+                    if (i === 2) {
+                        box1.position.y = 1;
+                        box2.position.y = 1;
+                        box2.position.x = 2;
+                    } else {
+                        box1.position.x = i;
+                        box2.position.x = i + 1;
+                        box2.position.y = 2;
                     }
 
-                    window.engine = await asyncEngineCreation();
-        if (!engine) throw 'engine should not be null.';
-        startRenderLoop(engine, canvas);
-        window.scene = createScene();};
-        initFunction().then(() => {sceneToRender = scene                    
-        });
+                    const box1Color = new BABYLON.StandardMaterial("box1Color");
+                    box1Color.diffuseColor = new BABYLON.Color3(0.21, 0.36, 0.47);
+                    box1.material = box1Color;
+
+                    const box2Color = new BABYLON.StandardMaterial("box2Color");
+                    box2Color.diffuseColor = new BABYLON.Color3(0.41, 0.76, 0.76);
+                    box2.material = box2Color;
+                }
+            }
+
+            createLogo();
+
+            return scene;
+        }
+
+        window.initFunction = async function() {
+            var asyncEngineCreation = async function() {
+                try {
+                return createDefaultEngine();
+                } catch(e) {
+                console.log("the available createEngine function failed. Creating the default engine instead");
+                return createDefaultEngine();
+                }
+            }
+
+            window.engine = await asyncEngineCreation();
+            if (!engine) throw 'engine should not be null.';
+            startRenderLoop(engine, canvas);
+            window.scene = createScene();
+        };
+
+        initFunction().then(() => sceneToRender = scene);
 
         // Resize
         window.addEventListener("resize", function () {
