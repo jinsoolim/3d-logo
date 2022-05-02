@@ -37,82 +37,82 @@
             }
         </style>
     </head>
-<body>
-    <canvas id="renderCanvas"></canvas>
-    <script>
-        var canvas = document.getElementById("renderCanvas");
+    <body>
+        <canvas id="renderCanvas"></canvas>
+        <script>
+            var canvas = document.getElementById("renderCanvas");
 
-        var startRenderLoop = function (engine, canvas) {
-            engine.runRenderLoop(function () {
-                if (sceneToRender && sceneToRender.activeCamera) {
-                    sceneToRender.render();
-                }
-            });
-        }
-
-        var engine = null;
-        var scene = null;
-        var sceneToRender = null;
-        var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
-        const createScene = () => {
-    const scene = new BABYLON.Scene(engine);
-
-    const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(.5,0,0));
-    camera.attachControl(canvas, true);
-
-    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0,1,0));
-
-    const createLogo = () => {
-        for (let i = 0; i <= 2; i+=1) {
-            const box1 = BABYLON.MeshBuilder.CreateBox(`box1${i}`, {});
-            const box2 = BABYLON.MeshBuilder.CreateBox(`box2${i}`, {});
-            if (i === 2) {
-                box1.position.y = 1;
-                box2.position.y = 1;
-                box2.position.x = 2;
-            } else {
-                box1.position.x = i;
-                box2.position.x = i + 1;
-                box2.position.y = 2;
+            var startRenderLoop = function (engine, canvas) {
+                engine.runRenderLoop(function () {
+                    if (sceneToRender && sceneToRender.activeCamera) {
+                        sceneToRender.render();
+                    }
+                });
             }
 
-            const box1Color = new BABYLON.StandardMaterial("box1Color");
-            box1Color.diffuseColor = new BABYLON.Color3(0.21, 0.36, 0.47);
-            box1.material = box1Color;
+            var engine = null;
+            var scene = null;
+            var sceneToRender = null;
+            var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
+            const createScene = () => {
+                const scene = new BABYLON.Scene(engine);
 
-            const box2Color = new BABYLON.StandardMaterial("box2Color");
-            box2Color.diffuseColor = new BABYLON.Color3(0.41, 0.76, 0.76);
-            box2.material = box2Color;
-        }
-    }
+                const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(.5,0,0));
+                camera.attachControl(canvas, true);
 
-    createLogo();
+                const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0,1,0));
 
-    return scene;
-}
-                window.initFunction = async function() {
-                    
-                    
-                    var asyncEngineCreation = async function() {
-                        try {
-                        return createDefaultEngine();
-                        } catch(e) {
-                        console.log("the available createEngine function failed. Creating the default engine instead");
-                        return createDefaultEngine();
+                const createLogo = () => {
+                    for (let i = 0; i <= 2; i+=1) {
+                        const box1 = BABYLON.MeshBuilder.CreateBox(`box1${i}`, {});
+                        const box2 = BABYLON.MeshBuilder.CreateBox(`box2${i}`, {});
+                        if (i === 2) {
+                            box1.position.y = 1;
+                            box2.position.y = 1;
+                            box2.position.x = 2;
+                        } else {
+                            box1.position.x = i;
+                            box2.position.x = i + 1;
+                            box2.position.y = 2;
                         }
+
+                        const box1Color = new BABYLON.StandardMaterial("box1Color");
+                        box1Color.diffuseColor = new BABYLON.Color3(0.21, 0.36, 0.47);
+                        box1.material = box1Color;
+
+                        const box2Color = new BABYLON.StandardMaterial("box2Color");
+                        box2Color.diffuseColor = new BABYLON.Color3(0.41, 0.76, 0.76);
+                        box2.material = box2Color;
                     }
+                }
 
-                    window.engine = await asyncEngineCreation();
-        if (!engine) throw 'engine should not be null.';
-        startRenderLoop(engine, canvas);
-        window.scene = createScene();};
-        initFunction().then(() => {sceneToRender = scene                    
-        });
+                createLogo();
 
-        // Resize
-        window.addEventListener("resize", function () {
-            engine.resize();
-        });
-    </script>
-</body>
+                return scene;
+            }
+
+            window.initFunction = async function() {
+                var asyncEngineCreation = async function() {
+                    try {
+                    return createDefaultEngine();
+                    } catch(e) {
+                    console.log("the available createEngine function failed. Creating the default engine instead");
+                    return createDefaultEngine();
+                    }
+                }
+
+                window.engine = await asyncEngineCreation();
+                if (!engine) throw 'engine should not be null.';
+                startRenderLoop(engine, canvas);
+                window.scene = createScene();
+            };
+
+            initFunction().then(() => sceneToRender = scene);
+
+            // Resize
+            window.addEventListener("resize", function () {
+                engine.resize();
+            });
+        </script>
+    </body>
 </html>
